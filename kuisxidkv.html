@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DKV Challenge - Quiz Interaktif Class XI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen relative overflow-x-hidden flex flex-col justify-between">
+
+  <!-- Background Decorative Orbs -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-10 right-10 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+  <!-- Navbar Header -->
+  <header class="w-full max-w-5xl mx-auto px-6 pt-6 flex justify-between items-center z-10 relative">
+    <div class="flex items-center gap-3">
+      <div class="p-3 bg-gradient-to-tr from-indigo-500 to-fuchsia-500 rounded-2xl shadow-lg shadow-indigo-500/30">
+        <i class="fa-solid fa-camera-retro text-2xl text-white"></i>
+      </div>
+      <div>
+        <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">DKV CREATIVE QUIZ</h1>
+        <p class="text-xs text-indigo-400 font-semibold tracking-wide">KELAS XI SMK • MATERI PILIHAN</p>
+      </div>
+    </div>
+    <div id="student-profile" class="hidden flex items-center gap-4">
+      <div class="flex items-center gap-2 bg-slate-800/80 border border-slate-700/60 px-4 py-2 rounded-xl text-amber-400 font-bold text-sm">
+        <i class="fa-solid fa-fire text-amber-400"></i>
+        <span id="score-display">0 XP</span>
+      </div>
+      <div class="text-right">
+        <p id="display-name" class="text-sm font-bold text-slate-200">-</p>
+        <p id="display-class" class="text-xs text-indigo-400">-</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto px-6 py-8 relative z-10 w-full">
+
+    <!-- FORM INPUT IDENTITAS SISWA (HALAMAN AWAL) -->
+    <div id="identity-screen" class="bg-slate-800/90 border border-slate-700/80 rounded-3xl p-8 shadow-2xl shadow-indigo-950/50 max-w-lg mx-auto">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl flex items-center justify-center mx-auto mb-3 text-indigo-400 text-2xl">
+          <i class="fa-solid fa-id-card"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-100">Selamat Datang!</h2>
+        <p class="text-xs text-slate-400 mt-1">Isi data diri Anda sebelum memulai 40 Soal Kuis DKV</p>
+      </div>
+
+      <form id="quiz-start-form" class="space-y-4" onsubmit="startQuiz(event)">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Nama Lengkap Siswa</label>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-500"></i>
+            <input type="text" id="student-name" required placeholder="Contoh: Ahmad Rizky" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 pl-11 pr-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Kelas / Rombel</label>
+          <div class="relative">
+            <i class="fa-solid fa-graduation-cap absolute left-4 top-3.5 text-slate-500"></i>
+            <!-- ISIAN KELAS MANUAL -->
+            <input type="text" id="student-class" required placeholder="Contoh: XI DKV 2" class="w-full bg-slate-900 border border-slate-700 rounded-xl py-3 pl-11 pr-4 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full mt-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white font-bold text-sm transition shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2">
+          Mulai Mengerjakan <i class="fa-solid fa-play"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- HALAMAN SOAL KUIS -->
+    <div id="quiz-screen" class="hidden">
+      <!-- Progress Bar Card -->
+      <div class="mb-6 bg-slate-800/60 border border-slate-700/50 p-4 rounded-2xl flex items-center justify-between gap-4">
+        <div class="flex-1">
+          <div class="flex justify-between text-xs font-semibold text-slate-400 mb-2">
+            <span>PROGRES KUIS</span>
+            <span id="progress-text" class="text-indigo-400">Soal 1 dari 40</span>
+          </div>
+          <div class="w-full bg-slate-700/50 h-3 rounded-full overflow-hidden p-0.5">
+            <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-fuchsia-500 h-full rounded-full transition-all duration-300" style="width: 2.5%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Box -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-3xl p-6 md:p-8 shadow-2xl shadow-indigo-950/50">
+        
+        <div class="flex items-center justify-between mb-4">
+          <span id="question-category" class="bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+            <i class="fa-solid fa-layer-group"></i> KATEGORI
+          </span>
+          <span class="text-xs text-slate-400 bg-slate-700/50 px-2.5 py-1 rounded-md font-mono">Pilihan Ganda</span>
+        </div>
+
+        <!-- Judul Soal -->
+        <h2 id="question-text" class="text-lg md:text-xl font-bold text-slate-100 leading-relaxed mb-6">
+          Pertanyaan akan tampil di sini...
+        </h2>
+
+        <!-- Visual Element Container (Jika Soal Memiliki Gambar/Grafik) -->
+        <div id="visual-container" class="hidden mb-6 rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-900/80 p-4 flex flex-col items-center">
+          <div id="visual-content" class="w-full flex justify-center"></div>
+        </div>
+
+        <!-- Answer Options (A - E) -->
+        <div id="options-container" class="space-y-3">
+          <!-- Opsi akan dibuat dinamis melalui JavaScript -->
+        </div>
+
+        <!-- Action Footer -->
+        <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-700/60">
+          <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-400 font-bold text-sm hover:bg-slate-700 hover:text-slate-200 transition flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+          </button>
+          <button id="next-btn" onclick="nextQuestion()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-fuchsia-500 hover:from-indigo-600 hover:to-fuchsia-600 text-white font-bold text-sm transition shadow-lg shadow-indigo-500/25 flex items-center gap-2">
+            Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HALAMAN HASIL / RESULT -->
+    <div id="result-screen" class="hidden bg-slate-800/90 border border-slate-700/80 rounded-3xl p-8 shadow-2xl shadow-indigo-950/50 max-w-lg mx-auto text-center">
+      <div class="w-20 h-20 bg-emerald-500/10 border border-emerald-500/30 rounded-3xl flex items-center justify-center mx-auto mb-4 text-emerald-400 text-3xl">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h2 class="text-2xl font-extrabold text-slate-100">Kuis Selesai!</h2>
+      <p class="text-xs text-slate-400 mt-1 mb-6">Berikut adalah hasil pekerjaan Anda:</p>
+
+      <div class="bg-slate-900/80 border border-slate-700/60 rounded-2xl p-6 mb-6 space-y-3 text-left">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Nama:</span>
+          <span id="res-name" class="font-bold text-slate-200">-</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Kelas:</span>
+          <span id="res-class" class="font-bold text-slate-200">-</span>
+        </div>
+        <hr class="border-slate-800">
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Jawaban Benar:</span>
+          <span id="res-correct" class="font-bold text-emerald-400">0 / 40</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-slate-400">Nilai Akhir:</span>
+          <span id="res-score" class="font-extrabold text-2xl text-amber-400">0</span>
+        </div>
+      </div>
+
+      <button onclick="location.reload()" class="w-full py-3.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm transition">
+        Ulangi Kuis <i class="fa-solid fa-rotate-right ml-2"></i>
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="text-center py-4 text-xs text-slate-500 z-10 relative">
+    &copy; DKV Challenge - Media Pembelajaran Interaktif SMK
+  </footer>
+
+  <!-- SCRIPT DATABASE SOAL & LOGIKA NAVIGASI -->
+  <script>
+    // Bank Data 40 Soal DKV
+    const questions = [
+      // FOTOGRAFI (1-8)
+      {
+        cat: "FOTOGRAFI",
+        q: "1. Kombinasi tiga elemen utama yaitu Aperture, Shutter Speed, dan ISO yang mengatur jumlah cahaya yang masuk ke sensor kamera disebut...",
+        options: ["Segitiga Komposisi", "Segitiga Exposure", "Rule of Thirds", "Depth of Field", "White Balance Ratio"],
+        ans: 1
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "2. Efek visual yang terjadi ketika Anda menggunakan Aperture dengan bukaan sangat lebar (misal f/1.8) adalah...",
+        options: ["Seluruh bidang foto menjadi tajam", "Latar belakang menjadi blur/bokeh (DoF sempit)", "Foto mengalami Motion Blur", "Foto menjadi sangat gelap", "Timbul noise tajam pada gambar"],
+        ans: 1
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "3. Perhatikan gambar grafik histogram di bawah! Kondisi pencahayaan apakah yang dialami oleh foto tersebut?",
+        options: ["Overexposure (Terlalu terang)", "Underexposure (Terlalu gelap)", "Perfect Exposure (Seimbang)", "Low Contrast", "Color Cast"],
+        ans: 0,
+        visual: `<div class="w-full max-w-xs h-32 bg-slate-950 rounded-xl relative p-2 border border-slate-800 flex items-end">
+                  <svg class="w-full h-full text-indigo-500" viewBox="0 0 100 40" preserveAspectRatio="none">
+                    <path fill="currentColor" fill-opacity="0.4" d="M0,40 L0,38 Q10,38 30,39 Q50,35 70,30 Q90,5 100,0 L100,40 Z"></path>
+                  </svg>
+                  <span class="absolute bottom-1 left-2 text-[10px] text-slate-500">Shadows</span>
+                  <span class="absolute bottom-1 right-2 text-[10px] text-slate-500">Highlights</span>
+                 </div>`
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "4. Jenis lensa yang memiliki panjang fokus bervariasi (misal 18-55mm) dan fleksibel untuk berbagai situasi pemotretan disebut...",
+        options: ["Lensa Fix / Prime", "Lensa Zoom", "Lensa Macro", "Lensa Telephoto", "Lensa Fisheye"],
+        ans: 1
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "5. [Menjodohkan] Manakah pasangan Fungsi Peralatan Fotografi yang TEPAT di bawah ini?",
+        options: [
+          "Softbox = Memantulkan cahaya alami; Tripod = Meredupkan kilat",
+          "Tripod = Menjaga kestabilan kamera; Softbox = Melembutkan cahaya flash",
+          "Filter ND = Menambah efek bokeh; Reflector = Menyerap bayangan berlebih",
+          "Flash External = Menstabilkan gambar; Softbox = Memperluas jarak fokus",
+          "Reflector = Mempercepat Shutter Speed; Tripod = Mengatur ISO"
+        ],
+        ans: 1
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "6. Komposisi fotografi yang menempatkan objek utama pada titik potong dari garis imajiner 3x3 disebut...",
+        options: ["Symmetry Line", "Leading Lines", "Rule of Thirds", "Golden Ratio", "Framing"],
+        ans: 2
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "7. [Checkbox/Pilihan Berganda] Manakah dari faktor berikut yang mempengaruhi Kedalaman Bidang / Depth of Field (DoF)? (Pilih jawaban yang paling mencakup semua elemen benar)",
+        options: [
+          "Bukaan Aperture, Jarak Fokus ke Objek, dan Panjang Fokus Lensa",
+          "Shutter Speed, ISO, dan Merek Kamera",
+          "White Balance, Ukuran Memory Card, dan Tripod",
+          "Sudut Pengambilan Gambar dan Jenis File JPEG/RAW",
+          "Lighting Studio, Flash, dan Megapixel Sensor"
+        ],
+        ans: 0
+      },
+      {
+        cat: "FOTOGRAFI",
+        q: "8. Format penyimpanan gambar mentah tanpa kompresi yang menyimpan seluruh data sensor dinamakan...",
+        options: ["JPEG", "PNG", "RAW", "TIFF", "GIF"],
+        ans: 2
+      },
+
+      // VIDEOGRAFI (9-16)
+      {
+        cat: "VIDEOGRAFI",
+        q: "9. Sudut pengambilan gambar di mana posisi kamera berada lebih tinggi dari objek sehingga objek terlihat kecil/lemah adalah...",
+        options: ["Eye Level", "Low Angle", "High Angle", "Bird Eye View", "Frog Eye"],
+        ans: 2
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "10. Pergerakan kamera secara horizontal dari kiri ke kanan atau sebaliknya pada poros tetap disebut...",
+        options: ["Tilting", "Panning", "Dolly", "Tracking", "Zooming"],
+        ans: 1
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "11. Ukuran pengambilan gambar (Shot Size) yang menampilkan objek dari dada hingga atas kepala dinamakan...",
+        options: ["Extreme Long Shot", "Medium Shot", "Medium Close Up", "Extreme Close Up", "Full Shot"],
+        ans: 2
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "12. Teknis pencahayaan standar 3 titik (Three-Point Lighting) terdiri dari tiga lampu utama, yaitu...",
+        options: [
+          "Front Light, Side Light, Top Light",
+          "Key Light, Fill Light, Back Light",
+          "Main Light, Soft Light, Hard Light",
+          "Spot Light, Flood Light, Ambient Light",
+          "Direct Light, Bounce Light, Rim Light"
+        ],
+        ans: 1
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "13. Standar kecepatan bingkai gambar per detik (Frame Rate) yang biasa digunakan untuk memberikan kesan cinematic pada film adalah...",
+        options: ["12 fps", "24 fps", "60 fps", "120 fps", "240 fps"],
+        ans: 1
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "14. Pergerakan kamera mendekati atau menjauhi objek dengan cara memindahkan posisi fisik kamera di atas rel/roda dinamakan...",
+        options: ["Pan In / Pan Out", "Tilt Up / Tilt Down", "Dolly In / Dolly Out", "Pedestal Up / Down", "Rack Focus"],
+        ans: 2
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "15. Perbedaan mendasar antara teknik Panning dan Tracking terletak pada...",
+        options: [
+          "Panning mengubah zoom lensa, Tracking memutar kamera",
+          "Panning posisi kamera diam berputar pada porosnya, Tracking posisi kamera berpindah tempat",
+          "Panning bergerak vertikal, Tracking bergerak horizontal",
+          "Panning untuk rekaman indoor, Tracking khusus outdoor",
+          "Tidak ada perbedaan antara keduanya"
+        ],
+        ans: 1
+      },
+      {
+        cat: "VIDEOGRAFI",
+        q: "16. Istilah untuk pengambilan gambar dari sudut mata katak (kamera berada sangat rendah di atas tanah) adalah...",
+        options: ["High Angle", "Frog Eye View", "Dutch Angle", "Over the Shoulder", "Bird Eye View"],
+        ans: 1
+      },
+
+      // VIDEO EDITING (17-24)
+      {
+        cat: "VIDEO EDITING",
+        q: "17. Shortcut keyboard pada Adobe Premiere Pro yang berfungsi untuk memotong klip video (Razor Tool) adalah tombol...",
+        options: ["V", "C", "B", "A", "M"],
+        ans: 1
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "18. Teknik potongan suara di mana suara klip berikutnya terdengar terlebih dahulu sebelum gambarnya muncul disebut...",
+        options: ["L-Cut", "J-Cut", "Jump Cut", "Match Cut", "Cross Cut"],
+        ans: 1
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "19. Efek video yang digunakan untuk menghilangkan latar belakang berwarna hijau/biru (Chroma Key) di Adobe Premiere adalah...",
+        options: ["Ultra Key", "Color Balance", "Gaussian Blur", "Crop", "Warp Stabilizer"],
+        ans: 0
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "20. Istilah untuk penyesuaian warna teknis agar rekaman terlihat natural dan sesuai dengan kondisi asli dinamakan...",
+        options: ["Color Grading", "Color Correction", "Color Match", "Color Curves", "Color LUTs"],
+        ans: 1
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "21. Transisi audio yang meredupkan suara klip A secara perlahan bersamaan dengan mengerasnya suara klip B disebut...",
+        options: ["Constant Gain", "Exponential Fade", "Crossfade / Constant Power", "Hard Cut", "Audio Gain"],
+        ans: 2
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "22. Fitur untuk menstabilkan guncangan pada video hasil rekaman tanpa tripod di software editing dinamakan...",
+        options: ["Time Remapping", "Warp Stabilizer", "Optical Flow", "Speed/Duration", "Frame Sampling"],
+        ans: 1
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "23. Proses akhir menyatukan seluruh elemen video, audio, dan efek menjadi satu file utuh siap tonton dinamakan...",
+        options: ["Importing", "Rendering / Exporting", "Trimming", "Capturing", "Scrubbing"],
+        ans: 1
+      },
+      {
+        cat: "VIDEO EDITING",
+        q: "24. Istilah penyesuaian kecepatan video (mempercepat atau memperlambat gerakan) pada timeline dikenal dengan sebutan...",
+        options: ["Timecode", "Time Remapping / Speed", "Ripple Edit", "Keyframing", "Nested Sequence"],
+        ans: 1
+      },
+
+      // PHOTO EDITING (25-32)
+      {
+        cat: "PHOTO EDITING",
+        q: "25. Tool pada Adobe Photoshop yang berfungsi untuk menyeleksi area berdasarkan kesamaan warna secara otomatis adalah...",
+        options: ["Lasso Tool", "Magic Wand Tool", "Crop Tool", "Clone Stamp Tool", "Pen Tool"],
+        ans: 1
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "26. Pengeditan yang tidak merusak data piksel asli pada gambar (Non-destructive editing) paling baik dilakukan menggunakan...",
+        options: ["Eraser Tool", "Adjustment Layers & Layer Mask", "Direct Filter Apply", "Image > Trim", "Flatten Image"],
+        ans: 1
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "27. Perhatikan gambar diagram kurva warna di bawah! Manipulasi grafik membentuk garis 'S-Curve' digunakan untuk...",
+        options: ["Menurunkan Kontras", "Meningkatkan Kontras (Boost Contrast)", "Membuat Foto Hitam Putih", "Membalikkan Warna (Invert)", "Menghilangkan Noise"],
+        ans: 1,
+        visual: `<div class="w-32 h-32 bg-slate-950 rounded-xl relative p-2 border border-slate-800 flex items-center justify-center">
+                  <svg class="w-full h-full text-fuchsia-500" viewBox="0 0 100 100">
+                    <path fill="none" stroke="currentColor" stroke-width="3" d="M10,90 C30,90 40,10 90,10"></path>
+                    <line x1="10" y1="90" x2="90" y2="10" stroke="#475569" stroke-dasharray="2" stroke-width="1"/>
+                  </svg>
+                 </div>`
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "28. Resolusi standar minimal yang direkomendasikan untuk cetak desain berkualitas tinggi (Print Ready) adalah...",
+        options: ["72 ppi", "96 ppi", "150 ppi", "300 ppi", "1200 ppi"],
+        ans: 3
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "29. Mode warna yang WAJIB digunakan jika hasil karya desain/foto bertujuan untuk dicetak fisik pada media kertas/banner adalah...",
+        options: ["RGB", "CMYK", "Grayscale", "Lab Color", "Indexed Color"],
+        ans: 1
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "30. Tool yang digunakan untuk menyalin area piksel tertentu lalu menimpalkannya ke area lain guna menghilangkan noda pada foto adalah...",
+        options: ["Healing Brush Tool", "Clone Stamp Tool", "Spot Healing Brush", "Blur Tool", "Smudge Tool"],
+        ans: 1
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "31. Fitur untuk mengubah foto berwarna menjadi hitam putih dengan kontrol saluran warna penuh pada Photoshop adalah...",
+        options: ["Desaturate", "Black & White Adjustment Layer", "Grayscale Mode", "Invert", "Threshold"],
+        ans: 1
+      },
+      {
+        cat: "PHOTO EDITING",
+        q: "32. Ekstensi format file gambar yang mendukung latar belakang transparan (Alpha Channel) adalah...",
+        options: ["JPG / JPEG", "PNG", "BMP", "RAW", "SVG"],
+        ans: 1
+      },
+
+      // KONTEN KREATOR (33-40)
+      {
+        cat: "KONTEN KREATOR",
+        q: "33. Tiga tahapan alur kerja produksi konten kreatif secara berurutan yang benar adalah...",
+        options: [
+          "Produksi - Pra-produksi - Pasca-produksi",
+          "Pra-produksi - Produksi - Pasca-produksi",
+          "Pasca-produksi - Produksi - Pra-produksi",
+          "Pra-produksi - Pasca-produksi - Produksi",
+          "Editing - Syuting - Perencanaan"
+        ],
+        ans: 1
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "34. Elemen penting pada 3 detik pertama video pendek (Reels/TikTok/Shorts) untuk menahan penonton agar tidak menggeser layar dinamakan...",
+        options: ["Call to Action (CTA)", "Hook", "Outro", "Thumbnail", "Hashtag"],
+        ans: 1
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "35. Rasio aspek (Aspect Ratio) standar untuk platform video vertikal seperti TikTok, Instagram Reels, dan YouTube Shorts adalah...",
+        options: ["16:9", "4:3", "1:1", "9:16", "21:9"],
+        ans: 3
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "36. Metrik yang mengukur seberapa sering audiens mengklik thumbnail video setelah melihatnya di beranda dinamakan...",
+        options: ["Engagement Rate", "Click-Through Rate (CTR)", "Retention Rate", "Conversion Rate", "Impression"],
+        ans: 1
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "37. Lisensi hak cipta yang mengizinkan penggunaan karya orang lain secara gratis dengan syarat mencantumkan pembuat aslinya dinamakan...",
+        options: ["All Rights Reserved", "Creative Commons (CC-BY)", "Public Domain", "Copyright Infringement", "Royalty Fee"],
+        ans: 1
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "38. Pengelompokan tema utama konten (misal: Edukasi, Hiburan, BTS) agar feed media sosial terstruktur dengan baik dinamakan...",
+        options: ["Content Pillar", "Content Matrix", "Content Schedule", "Content Marketing", "Content Brief"],
+        ans: 0
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "39. Kalimat ajakan di akhir video yang meminta penonton melakukan aksi seperti 'Like, Comment, & Subscribe' dinamakan...",
+        options: ["Hook", "Headline", "Call to Action (CTA)", "Caption", "Tagline"],
+        ans: 2
+      },
+      {
+        cat: "KONTEN KREATOR",
+        q: "40. Grafik yang menunjukkan berapa lama penonton bertahan menyaksikan video dari awal hingga akhir dinamakan...",
+        options: ["Audience Retention", "Impression Graph", "Watch Time Rate", "Reach Analytics", "Algorithm Flow"],
+        ans: 0
+      }
+    ];
+
+    // Variables State
+    let currentQ = 0;
+    let userAnswers = new Array(questions.length).fill(null);
+    let studentName = "";
+    let studentClass = "";
+
+    function startQuiz(e) {
+      e.preventDefault();
+      studentName = document.getElementById('student-name').value.trim();
+      studentClass = document.getElementById('student-class').value.trim();
+
+      if(studentName && studentClass) {
+        document.getElementById('display-name').textContent = studentName;
+        document.getElementById('display-class').textContent = studentClass;
+        document.getElementById('student-profile').classList.remove('hidden');
+
+        document.getElementById('identity-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+
+        renderQuestion();
+      }
+    }
+
+    function renderQuestion() {
+      const q = questions[currentQ];
+      
+      // Update Progress
+      document.getElementById('progress-text').textContent = `Soal ${currentQ + 1} dari ${questions.length}`;
+      document.getElementById('progress-bar').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+      document.getElementById('score-display').textContent = `${calcXP()} XP`;
+
+      // Update Question Info
+      document.getElementById('question-category').innerHTML = `<i class="fa-solid fa-layer-group"></i> ${q.cat}`;
+      document.getElementById('question-text').textContent = q.q;
+
+      // Handle Visual Element
+      const visContainer = document.getElementById('visual-container');
+      const visContent = document.getElementById('visual-content');
+      if(q.visual) {
+        visContent.innerHTML = q.visual;
+        visContainer.classList.remove('hidden');
+      } else {
+        visContainer.classList.add('hidden');
+        visContent.innerHTML = '';
+      }
+
+      // Render Options
+      const optContainer = document.getElementById('options-container');
+      optContainer.innerHTML = '';
+
+      const optionLabels = ['A', 'B', 'C', 'D', 'E'];
+
+      q.options.forEach((opt, idx) => {
+        const isSelected = userAnswers[currentQ] === idx;
+        
+        const label = document.createElement('label');
+        label.className = `flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${
+          isSelected 
+            ? 'bg-indigo-600/20 border-2 border-indigo-500' 
+            : 'bg-slate-900/50 border border-slate-700/60 hover:border-slate-500 hover:bg-slate-800/80'
+        }`;
+        label.onclick = () => selectOption(idx);
+
+        label.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl font-bold flex items-center justify-center text-sm ${
+              isSelected ? 'bg-indigo-500 text-white shadow-md' : 'bg-slate-800 text-slate-400'
+            }">${optionLabels[idx]}</span>
+            <span class="text-sm md:text-base ${isSelected ? 'font-semibold text-slate-100' : 'font-medium text-slate-300'}">${opt}</span>
+          </div>
+          ${isSelected ? '<i class="fa-solid fa-circle-check text-indigo-400 text-xl"></i>' : ''}
+        `;
+
+        optContainer.appendChild(label);
+      });
+
+      // Update Nav Buttons
+      document.getElementById('prev-btn').disabled = currentQ === 0;
+      document.getElementById('prev-btn').style.opacity = currentQ === 0 ? "0.5" : "1";
+
+      const nextBtn = document.getElementById('next-btn');
+      if(currentQ === questions.length - 1) {
+        nextBtn.innerHTML = `Selesai Kuis <i class="fa-solid fa-check-double ml-1"></i>`;
+      } else {
+        nextBtn.innerHTML = `Selanjutnya <i class="fa-solid fa-arrow-right ml-1"></i>`;
+      }
+    }
+
+    function selectOption(idx) {
+      userAnswers[currentQ] = idx;
+      renderQuestion();
+    }
+
+    function calcXP() {
+      let correct = 0;
+      userAnswers.forEach((ans, i) => {
+        if(ans === questions[i].ans) correct++;
+      });
+      return correct * 25; // 25 XP per jawaban benar
+    }
+
+    function nextQuestion() {
+      if(currentQ < questions.length - 1) {
+        currentQ++;
+        renderQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function prevQuestion() {
+      if(currentQ > 0) {
+        currentQ--;
+        renderQuestion();
+      }
+    }
+
+    function finishQuiz() {
+      let correctCount = 0;
+      userAnswers.forEach((ans, i) => {
+        if(ans === questions[i].ans) correctCount++;
+      });
+
+      const finalScore = Math.round((correctCount / questions.length) * 100);
+
+      document.getElementById('quiz-screen').classList.add('hidden');
+      document.getElementById('result-screen').classList.remove('hidden');
+
+      document.getElementById('res-name').textContent = studentName;
+      document.getElementById('res-class').textContent = studentClass;
+      document.getElementById('res-correct').textContent = `${correctCount} dari ${questions.length} Soal`;
+      document.getElementById('res-score').textContent = `${finalScore} / 100`;
+    }
+  </script>
+</body>
+</html>
